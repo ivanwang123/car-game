@@ -80,7 +80,6 @@ export class WaterMaterial extends THREE.ShaderMaterial {
       varying vec2 vUv;
       varying vec4 vTextureUV;
       varying vec3 vNormal;
-      varying vec3 vTotalNormal;
       varying vec3 vViewDir;
       varying vec3 vViewPosition;
 
@@ -227,38 +226,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
         vec3 foamColor = vec3(1.0, 1.0, 1.0);
 
         vec3 color = mix(waterColor, reflectionColor, 0.4);
-        // color = mix(foamColor, color, step(0.25, specular - ditherOffset));
-        // color = mix(pointLight, color, step(0.25, specular.x - ditherOffset));
-        // color = mix(color, directionalLight, step(0.25, specular.x - ditherOffset));
         color = mix(foamColor, color, step(0.25, zDiff - ditherOffset));
-        // color = mix(directionalLight, color, step(0.25, 0.3));
-        // color = mix(pointLight, color, step(0.25, 0.3));
-
-        // gl_FragColor = vec4(
-        //     color * (ambientLightColor + directionalLight + pointLight),
-        //     1.0);
-        // gl_FragColor = vec4(
-        //     color,
-        //     1.0);
-
-        // vec3 normalColor = vec3(dot(vNormal, normalize(directionalLights[0].direction)));
-        float normalColor = smoothstep(0.6, 1.0, dot(vNormal, normalize(uInverseViewMatrix * vec4(-directionalLights[0].direction, 0.0)).xyz));
-        vec3 pointLightDirection =
-            pointLights[0].position -
-            vec3(-vViewPosition.x, vViewPosition.y, vViewPosition.z);
-        float pointLightDistance =
-            sqrt(dot(pointLightDirection, pointLightDirection));
-        // vec3 normalColor = vec3(dot(vNormal, normalize(uInverseViewMatrix * vec4(-pointLightDirection, 0.0)).xyz));
-        vec3 pointNormalColor = normalize(pointLights[0].color) * dot(vNormal, normalize(uInverseViewMatrix * vec4(-pointLightDirection, 0.0)).xyz) / pow(pointLightDistance, 2.0);
-
-        // color = mix(color, vec3(1.0, 1.0, 1.0), normalColor);
-
-        // gl_FragColor = vec4(
-        //     normalColor,
-        //     1.0);
-        // gl_FragColor = vec4(
-        //     vNormal,
-        //     1.0);
 
         gl_FragColor = vec4(
             color * (ambientLightColor + directionalLight + pointLight),
@@ -286,7 +254,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
         float pointLightDistance${i} =
             sqrt(dot(pointLightDirection${i}, pointLightDirection${i}));
 
-        float NdotP${i} = dot(vTotalNormal, normalize(pointLightDirection${i}));
+        float NdotP${i} = dot(vNormal, normalize(pointLightDirection${i}));
         float pointLightIntensity${i} = max(-NdotP${i} + ditherOffset, 0.0);
         float pLevel${i} = floor(pointLightIntensity${i} * levels);
         pointLightIntensity${i} = pLevel${i} / levels;
@@ -311,7 +279,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
                       directionalShadow${i}.shadowBias, directionalShadow${i}.shadowRadius,
                       vDirectionalShadowCoord[${i}]);
 
-        float NdotD${i} = dot(vTotalNormal, directionalLights[${i}].direction);
+        float NdotD${i} = dot(vNormal, directionalLights[${i}].direction);
         float directionalLightIntensity${i} = max(-NdotD${i} + ditherOffset, 0.0);
         float directionalLevel${i} = floor(directionalLightIntensity${i} * levels);
         directionalLightIntensity${i} = directionalLevel${i} / levels;
