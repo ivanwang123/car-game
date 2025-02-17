@@ -35,7 +35,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
 				uResolution: {
 					value: world.resolution
 				},
-				uGlossiness: { value: 500 }
+				uGlossiness: { value: 50 }
 			},
 			vertexShader: waterVert,
 			fragmentShader: '',
@@ -92,7 +92,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
 
       float getDitherValue(ivec2 pixelCoord) {
         int index = (pixelCoord.x % 4) + (pixelCoord.y % 4) * 4;
-        return ditherMatrix[index] - 0.5; // Center around zero
+        return ditherMatrix[index] - 0.5; 
       }
 
       float linearize(float depth) {
@@ -102,36 +102,13 @@ export class WaterMaterial extends THREE.ShaderMaterial {
       void main() {
         ivec2 pixelCoord = ivec2(gl_FragCoord.xy);
         float ditherOffset =
-            getDitherValue(pixelCoord) * ditheringLevels; // Scale dithering
+            getDitherValue(pixelCoord) * ditheringLevels; 
 
         vec3 pointLight = vec3(0.0, 0.0, 0.0);
         vec3 directionalLight = vec3(0.0, 0.0, 0.0);
-        vec3 specular = vec3(0.0, 0.0, 0.0);
-        vec3 rim = vec3(0.0, 0.0, 0.0);
       
         ${this.#generatePointLighting(shader)}
         ${this.#generateDirectionalLighting(shader)}
-
-        // Specular lighting
-        // TODO: Check if directional light exist
-        vec3 halfVector0 = normalize(directionalLights[0].direction * 1.5 + vViewDir);
-        float NdotH0 = dot(vNormal, halfVector0);
-        float specularIntensity0 = pow(NdotH0, 1000.0 / uGlossiness);
-        float specularIntensitySmooth0 = smoothstep(0.05, 0.1, specularIntensity0);
-
-        specular += specularIntensitySmooth0 * 200.0 * directionalLights[0].color;
-
-        // TODO: Remove rim lighting
-        // Rim lighting
-        float rimDot0 = 1.0 - dot(vViewDir, vNormal);
-        float rimAmount0 = 0.7;
-
-        float rimThreshold0 = 0.7;
-        float rimIntensity0 = rimDot0 * pow(NdotD0, rimThreshold0);
-        rimIntensity0 =
-            smoothstep(rimAmount0 - 0.01, rimAmount0 + 0.01, rimIntensity0);
-
-        rim += rimIntensity0 * directionalLights[0].color;
 
         vec2 screenUV = gl_FragCoord.xy / uResolution.xy;
 

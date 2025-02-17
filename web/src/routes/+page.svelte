@@ -61,7 +61,7 @@
 
 	const ground = new Ground();
 	ground.position.y = 1.5;
-	// world.scene.add(ground);
+	world.scene.add(ground);
 
 	onMount(() => {
 		// Renderer
