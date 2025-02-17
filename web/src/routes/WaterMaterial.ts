@@ -34,8 +34,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
 				uTextureMatrix: { value: new THREE.Matrix4() },
 				uResolution: {
 					value: world.resolution
-				},
-				uGlossiness: { value: 50 }
+				}
 			},
 			vertexShader: waterVert,
 			fragmentShader: '',
@@ -70,7 +69,6 @@ export class WaterMaterial extends THREE.ShaderMaterial {
       uniform float uFar;
       uniform float uTime;
       uniform float uDisplacementAmount;
-      uniform float uGlossiness;
 
       uniform mat4 uInverseViewMatrix;
       uniform vec3 uDirectionalLight;
@@ -113,12 +111,7 @@ export class WaterMaterial extends THREE.ShaderMaterial {
         vec2 screenUV = gl_FragCoord.xy / uResolution.xy;
 
         // Displacement
-        vec2 displacementUV = vUv;
-        displacementUV.y += 1.0 * 0.01 * (sin(displacementUV.x * 3.5 + uTime * 0.35) + sin(displacementUV.x * 4.8 + uTime * 1.05) + sin(displacementUV.x * 7.3 + uTime * 0.45)) / 3.0;
-        displacementUV.x += 1.0 * 0.12 * (sin(displacementUV.y * 4.0 + uTime * 0.50) + sin(displacementUV.y * 6.8 + uTime * 0.75) + sin(displacementUV.y * 11.3 + uTime * 0.2)) / 3.0;
-        displacementUV.y += 1.0 * 0.12 * (sin(displacementUV.x * 4.2 + uTime * 0.64) + sin(displacementUV.x * 6.3 + uTime * 1.65) + sin(displacementUV.x * 8.2 + uTime * 0.45)) / 3.0;
-
-        vec2 displacement = texture2D(tDisplacement, displacementUV).rg;
+        vec2 displacement = texture2D(tDisplacement, vUv + uTime / 16.0).rg;
         displacement = ((displacement * 2.0) - 1.0) * uDisplacementAmount;
 
         // Foam depth

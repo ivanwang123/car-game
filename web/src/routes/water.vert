@@ -3,6 +3,7 @@
 
 uniform sampler2D tDisplacement;
 uniform mat4 uTextureMatrix;
+uniform float uDisplacementAmount;
 uniform float uTime;
 
 varying vec2 vUv;
@@ -25,25 +26,8 @@ void main() {
   vUv = uv;
   vTextureUV = uTextureMatrix * vec4(position, 1.0);
 
-  vec2 displacementUV = vUv;
-  displacementUV.y += 1.0 * 0.01 *
-                      (sin(displacementUV.x * 3.5 + uTime * 0.35) +
-                       sin(displacementUV.x * 4.8 + uTime * 1.05) +
-                       sin(displacementUV.x * 7.3 + uTime * 0.45)) /
-                      3.0;
-  displacementUV.x += 1.0 * 0.12 *
-                      (sin(displacementUV.y * 4.0 + uTime * 0.50) +
-                       sin(displacementUV.y * 6.8 + uTime * 0.75) +
-                       sin(displacementUV.y * 11.3 + uTime * 0.2)) /
-                      3.0;
-  displacementUV.y += 1.0 * 0.12 *
-                      (sin(displacementUV.x * 4.2 + uTime * 0.64) +
-                       sin(displacementUV.x * 6.3 + uTime * 1.65) +
-                       sin(displacementUV.x * 8.2 + uTime * 0.45)) /
-                      3.0;
-
-  float displacement = texture2D(tDisplacement, displacementUV).r;
-  displacement = ((displacement * 2.0) - 1.0) * 0.4;
+  float displacement = texture2D(tDisplacement, vUv + uTime / 16.0).r;
+  displacement = ((displacement * 2.0) - 1.0) * uDisplacementAmount;
 
   vec4 newPosition = vec4(position, 1.0);
   newPosition.z += displacement;
