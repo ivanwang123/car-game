@@ -41,25 +41,30 @@
 	const pointLight2 = new THREE.PointLight(0x0000ff, 5);
 	pointLight2.position.set(-2, 2, 0);
 	pointLight2.castShadow = true;
-	// world.scene.add(pointLight2);
+	world.scene.add(pointLight2);
 
 	const pointLightHelper2 = new THREE.PointLightHelper(pointLight2, 0.1);
 	world.scene.add(pointLightHelper2);
 
 	// Models
 	const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-	const cubeMaterial = new CustomToonMaterial(new THREE.Color(0xff773d));
+	const cubeMaterial = new CustomToonMaterial({ color: new THREE.Color(0xff773d) });
 
 	const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 	cube.position.set(0, 0.5, 0);
 	cube.castShadow = true;
 	world.scene.add(cube);
 
-	const water = new Water();
+	const water = new Water({ width: 30, height: 30, segments: 1 });
 	water.position.set(0, 0.5, 0);
 	world.scene.add(water);
 
-	const ground = new Ground();
+	const ground = new Ground({
+		width: 30,
+		height: 30,
+		segments: 1,
+		color: new THREE.Color(0xffffff)
+	});
 	ground.position.y = 1.5;
 	world.scene.add(ground);
 

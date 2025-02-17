@@ -4,6 +4,12 @@ import { WaterMaterial } from './WaterMaterial';
 import { TextureRenderer } from './TextureRenderer';
 import { World } from './World';
 
+export type WaterOptions = {
+	width: number;
+	height: number;
+	segments: number;
+};
+
 export class Water extends THREE.Mesh<
 	THREE.PlaneGeometry,
 	THREE.ShaderMaterial,
@@ -28,8 +34,13 @@ export class Water extends THREE.Mesh<
 
 	reflectorTextureRenderer: TextureRenderer | null;
 
-	constructor() {
-		const waterGeometry = new THREE.PlaneGeometry(10, 10, 20, 20);
+	constructor(options: WaterOptions) {
+		const waterGeometry = new THREE.PlaneGeometry(
+			options.width,
+			options.height,
+			options.width * options.segments,
+			options.height * options.segments
+		);
 		const waterMaterial = new WaterMaterial();
 
 		super(waterGeometry, waterMaterial);
@@ -66,11 +77,6 @@ export class Water extends THREE.Mesh<
 		this.material.uniforms.uTime.value = dt;
 		this.material.uniforms.tDiffuse.value = textureRenderer.diffuseDepthlessTexture;
 		this.material.uniforms.tDepth.value = textureRenderer.depthDepthlessTexture;
-		// this.material.uniforms = {
-		// 	...this.material.uniforms,
-		// 	...THREE.UniformsLib.lights
-		// };
-		// console.log(THREE.UniformsLib.lights.pointLights.value[0]);
 	}
 
 	onBeforeRender(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {

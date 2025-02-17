@@ -1,13 +1,18 @@
 import * as THREE from 'three';
 import toonVert from './toon.vert';
 
+export type CustomToonMaterialOptions = {
+	color: THREE.Color;
+	glossiness?: number;
+};
+
 export class CustomToonMaterial extends THREE.ShaderMaterial {
-	constructor(color: THREE.Color) {
+	constructor(options: CustomToonMaterialOptions) {
 		super({
 			uniforms: {
 				...THREE.UniformsLib.lights,
-				uGlossiness: { value: 5 },
-				uColor: { value: color }
+				uColor: { value: options.color },
+				uGlossiness: { value: options.glossiness || 0 }
 			},
 			vertexShader: toonVert,
 			fragmentShader: '',
@@ -43,16 +48,15 @@ export class CustomToonMaterial extends THREE.ShaderMaterial {
           0.75, 0.25, 0.875, 0.375,
           0.1875, 0.6875, 0.0625, 0.5625,
           0.9375, 0.4375, 0.8125, 0.3125
-      );
+        );
 
-      float getDitherValue(ivec2 pixelCoord) {
-          int index = (pixelCoord.x % 4) + (pixelCoord.y % 4) * 4;
-          return ditherMatrix[index] - 0.5;
+      float getDitherValue(ivec2 coord) {
+        int index = (coord.x % 4) + (coord.y % 4) * 4;
+        return ditherMatrix[index] - 0.5;
       }
 
       void main() {
-        ivec2 pixelCoord = ivec2(gl_FragCoord.xy);
-        float ditherOffset = getDitherValue(pixelCoord) * ditheringLevels;
+        float ditherOffset = getDitherValue(ivec2(gl_FragCoord.xy)) * ditheringLevels;
 
         vec3 pointLight = vec3(0.0, 0.0, 0.0);
         vec3 directionalLight = vec3(0.0, 0.0, 0.0);
